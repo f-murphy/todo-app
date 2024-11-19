@@ -2,7 +2,7 @@ package models
 
 import "time"
 
-type Note struct {
+type Todo struct {
 	ID        int       `json:"id"`
 	Title     string    `json:"title"`
 	Content   string    `json:"content"`
