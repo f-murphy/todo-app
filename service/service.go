@@ -7,7 +7,7 @@ import (
 
 type TodosServiceInterface interface {
 	FindAll() ([]*models.Todo, error)
-	Create(todo models.Todo) (models.Todo, error)
+	Create(todo models.Todo) (uint, error)
 	Update(todo models.Todo) (models.Todo, error)
 	Delete(id uint) error
 }
@@ -24,7 +24,7 @@ func (s *TodoService) FindAll() ([]*models.Todo, error) {
 	return s.repo.FindAll()
 }
 
-func (s *TodoService) Create(todo models.Todo) (models.Todo, error) {
+func (s *TodoService) Create(todo models.Todo) (uint, error) {
 	return s.repo.Create(todo)
 }
 

@@ -9,7 +9,7 @@ import (
 
 type TodoRepositoryInterface interface {
 	FindAll() ([]*models.Todo, error)
-	Create(todo models.Todo) (models.Todo, error)
+	Create(todo models.Todo) (uint, error)
 	Update(todo models.Todo) (models.Todo, error)
 	Delete(id uint) error
 }
@@ -24,7 +24,7 @@ func NewTodoRepository(db *sqlx.DB) *TodoRepository {
 
 func (r *TodoRepository) FindAll() ([]*models.Todo, error) {
 	todos := []*models.Todo{}
-	query := `SELECT * from Todos`
+	query := `SELECT id, title, content, completed, created_at, updated_at from Todos`
 
 	err := r.db.Select(&todos, query)
 	if err != nil {
@@ -33,16 +33,16 @@ func (r *TodoRepository) FindAll() ([]*models.Todo, error) {
 	return todos, nil
 }
 
-func (r *TodoRepository) Create(todo models.Todo) (models.Todo, error) {
+func (r *TodoRepository) Create(todo models.Todo) (uint, error) {
 	var id uint
 	now := time.Now()
 	err := r.db.QueryRow("INSERT INTO Todos (title, content, completed, created_at, updated_at) VALUES ($1, $2, $3, $4, $5) RETURNING id",
 		todo.Title, todo.Content, todo.Completed, now, now).Scan(&id)
 	if err != nil {
-		return models.Todo{}, err
+		return 0, err
 	}
 
-	return todo, nil
+	return id, nil
 }
 
 func (r *TodoRepository) Update(todo models.Todo) (models.Todo, error) {
