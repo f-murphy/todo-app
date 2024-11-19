@@ -22,7 +22,7 @@ func NewTodoRepository(db *sqlx.DB) *TodoRepository {
 	return &TodoRepository{db: db}
 }
 
-func (r *TodoRepository) findAll() ([]*models.Todo, error) {
+func (r *TodoRepository) FindAll() ([]*models.Todo, error) {
 	todos := []*models.Todo{}
 	query := `SELECT * from Todos`
 
