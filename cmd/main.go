@@ -1,22 +1,30 @@
 package main
 
 import (
-	"fmt"
-	"log"
 	"todo-app/configs"
 	"todo-app/handler"
 	"todo-app/repository"
 	"todo-app/service"
+	"todo-app/utils/logger"
 
-	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
+	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
+	logFile, err := logger.InitLogger()
+	if err != nil {
+		logrus.WithError(err).Fatal("Error loading logrus")
+	}
+	logrus.Info("logFile initialized successfully")
+	defer logFile.Close()
+
 	cfg, err := configs.InitConfig()
 	if err != nil {
-		fmt.Println("error initializing configs")
+		logrus.WithError(err).Fatal("error initializing configs")
 	}
+	logrus.Info("Configs initialized successfully")
 
 	db, err := repository.NewPostgresDB(repository.Config{
 		Host:     cfg.DB.Host,
@@ -27,10 +35,9 @@ func main() {
 		Password: cfg.DB.Password,
 	})
 	if err != nil {
-		log.Fatal("error initializing db")
+		logrus.WithError(err).Fatal("error initializing db")
 	}
-	defer db.Close()
-	fmt.Print("Database connected successfully")
+	logrus.Info("DB connection successfully")
 
 	repository := repository.NewTodoRepository(db)
 	service := service.NewTodoService(repository)
@@ -38,11 +45,11 @@ func main() {
 
 	r := gin.Default()
 	r.POST("/todo", handler.CreateTodo)
-	r.GET("/todo", handler.GetTodos)
-	r.PUT("/todo/:id", handler.UpdateTodo)
-	r.DELETE("/todo/:id", handler.DeleteTodo)
+	r.GET("/tasks", handler.GetTodos)
+	r.PUT("/task/:id", handler.UpdateTodo)
+	r.DELETE("/task/:id", handler.DeleteTodo)
 
 	if err := r.Run(":8080"); err != nil {
-		fmt.Println("Failed to run server: ", err)
+		logrus.WithError(err).Fatal("Failed to run server: ")
 	}
 }
