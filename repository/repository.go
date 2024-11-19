@@ -8,7 +8,7 @@ import (
 )
 
 type TodoRepositoryInterface interface {
-	findAll() ([]*models.Todo, error)
+	FindAll() ([]*models.Todo, error)
 	Create(todo models.Todo) (models.Todo, error)
 	Update(todo models.Todo) (models.Todo, error)
 	Delete(id uint) error
